@@ -1,0 +1,109 @@
+CREATE TABLE municipes
+(
+    id   VARCHAR(100),
+    nome VARCHAR(100) NOT NULL,
+    PRIMARY KEY (id)
+);
+
+-- ESTADOS
+
+CREATE TABLE estados
+(
+    id     VARCHAR(100),
+    estado VARCHAR(100) NOT NULL,
+    PRIMARY KEY (id)
+);
+
+INSERT INTO estados
+VALUES (0, 'Estudo Viabilidade'),
+       (1, 'Análise dos Munícipes'),
+       (2, 'Aprovada para Execução'),
+       (3, 'Rejeitada para Execução'),
+       (4, 'Em Orçamentação'),
+       (5, 'Análise de Execução'),
+       (6, 'Aprovada'),
+       (7, 'Inviável');
+
+/*SE obter um mínimo de 1000 avaliações com valor médio igual ou superior a 8 valores ENTÃO “Aprovado”
+
+Caso estas duas condições (avaliações dos munícipes >= 8 e 3 pareceres positivos)
+sejam atingidas, a análise passa para “Aprovada para Execução”, caso contrário a análise passa
+a “Rejeitada para Execução”.
+Quando tudo estiver pronto a proposta passa para o estado “Em Orçamento”.
+Assim que os prazos definidos para a orçamentação sejam atingidos e que existam orçamentos para todas as fases, a proposta passa para o estado “Análise de Execução”
+
+Caso todos os requisitos sejam satisfeitos, a obra passará para o estado “Aprovada”, no caso contrário passará para o estado final “Inviável”.*/
+
+-- PROPOSTAS
+
+CREATE TABLE propostas
+(
+    id              VARCHAR(100),
+    id_estado       VARCHAR(100) DEFAULT (0),
+    titulo          VARCHAR(100),
+    breve_descricao VARCHAR(255),
+    data_realizacao DATETIME,
+    PRIMARY KEY (id),
+    FOREIGN KEY (id_estado) REFERENCES estados (id)
+);
+
+CREATE TABLE propostas_exequiveis
+(
+    id_proposta          VARCHAR(100),
+    data_inicio_consulta DATETIME       NOT NULL,
+    data_fim_consulta    DATETIME       NOT NULL,
+    data_inicio_execucao DATETIME       NOT NULL,
+    data_fim_execucao    DATETIME       NOT NULL,
+    montante_execucao    DECIMAL(15, 2) NOT NULL,
+    FOREIGN KEY (id_proposta) REFERENCES propostas (id)
+);
+
+CREATE TABLE votos
+(
+    id_municipe   VARCHAR(100),
+    id_proposta   VARCHAR(100),
+    classificacao INT CHECK ( classificacao BETWEEN 10 and 0),
+    justificacao  VARCHAR(100) NOT NULL,
+    FOREIGN KEY (id_municipe) REFERENCES municipes (id),
+    FOREIGN KEY (id_proposta) REFERENCES propostas (id)
+);
+
+CREATE TABLE entidades
+(
+    id   VARCHAR(100),
+    nome VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id)
+);
+
+INSERT INTO entidades
+VALUES (0, 'Água'),
+       (1, 'Animais'),
+       (2, 'Natureza'),
+       (3, 'Tráfego');
+
+CREATE TABLE pareceres
+(
+    id          VARCHAR(100),
+    id_entidade VARCHAR(100),
+    titulo      VARCHAR(100) NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (id_entidade) REFERENCES entidades (id)
+);
+
+CREATE TABLE associacoes_pareceres
+(
+    id_parecer_1 VARCHAR(100),
+    id_parecer_2 VARCHAR(100),
+    FOREIGN KEY (id_parecer_1) REFERENCES pareceres (id),
+    FOREIGN KEY (id_parecer_2) REFERENCES pareceres (id)
+);
+
+CREATE TABLE pareceres_municipes
+(
+    id_municipe VARCHAR(100),
+    id_parecer  VARCHAR(100),
+    a_favor     BOOLEAN NOT NULL,
+    motivo      VARCHAR(255),
+    FOREIGN KEY (id_municipe) REFERENCES municipes (id),
+    FOREIGN KEY (id_parecer) REFERENCES pareceres (id)
+);
