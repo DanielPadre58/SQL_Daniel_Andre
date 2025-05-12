@@ -1,0 +1,64 @@
+CREATE TABLE fases
+(
+    id   VARCHAR(100),
+    nome VARCHAR(255),
+    PRIMARY KEY (id)
+);
+
+INSERT INTO fases
+VALUES (0, 'Terraplanagem'),
+       (1, 'Fundação'),
+       (2, 'Alvenaria'),
+       (3, 'Instalações Hidráulicas'),
+       (4, 'Instalações Elétricas'),
+       (5, 'Instalações Cobertura'),
+       (6, 'Instalações Acabamento');
+
+CREATE TABLE execucoes
+(
+    id_proposta       VARCHAR(100),
+    id_fase           VARCHAR(100),
+    data_inicio       DATETIME,
+    data_fim          DATETIME,
+    montante          DECIMAL(15, 2),
+    percentagem_coima DECIMAL(2, 1) CHECK ( percentagem_coima BETWEEN 100 and 0),
+    FOREIGN KEY (id_proposta) REFERENCES propostas (id),
+    FOREIGN KEY (id_fase) REFERENCES fases (id)
+);
+
+CREATE TABLE contrutoras
+(
+    id   VARCHAR(100),
+    nome VARCHAR(255),
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE consorcio
+(
+    id                VARCHAR(100),
+    designacao        VARCHAR(255),
+    data_constituicao DATETIME,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE contrutoras_consorcios
+(
+    id_construtora VARCHAR(100),
+    id_consorcio   VARCHAR(100),
+    FOREIGN KEY (id_construtora) REFERENCES contrutoras (id),
+    FOREIGN KEY (id_consorcio) REFERENCES consorcio (id)
+);
+
+CREATE TABLE orcamento
+(
+    id                   VARCHAR(100),
+    id_fase              VARCHAR(100),
+    id_proposta          VARCHAR(100),
+    id_construtora       VARCHAR(100),
+    id_consorcio         VARCHAR(100),
+    valorOrcamento       DECIMAL(15, 2),
+    data_inicio_execucao DATETIME,
+    data_fim_execucao    DATETIME,
+    PRIMARY KEY (id),
+    FOREIGN KEY (id_fase) REFERENCES fases (id)
+);
