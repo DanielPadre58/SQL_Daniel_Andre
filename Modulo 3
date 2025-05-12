@@ -1,0 +1,82 @@
+CREATE TABLE ordens_de_trabalho
+(
+    id           VARCHAR(100),
+    id_orcamento VARCHAR(100),
+    designacao   VARCHAR(255),
+    data_inicio  DATETIME,
+    data_fim     DATETIME,
+    PRIMARY KEY (id),
+    FOREIGN KEY (id_orcamento) REFERENCES orcamento (id)
+);
+
+CREATE TABLE ordensDeTrabalho_Orcamento
+(
+    id_orcamento      VARCHAR(100),
+    id_ordem_trabalho VARCHAR(100),
+    FOREIGN KEY (id_orcamento) REFERENCES orcamento (id),
+    FOREIGN KEY (id_ordem_trabalho) REFERENCES ordens_de_trabalho (id)
+);
+
+CREATE TABLE materiais
+(
+    id   VARCHAR(100),
+    nome VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE materiais_ordensDeTrabalho
+(
+    id_material       VARCHAR(100),
+    id_ordem_trabalho VARCHAR(100),
+    quantidade        INTEGER CHECK (quantidade > 0),
+    FOREIGN KEY (id_material) REFERENCES materiais (id),
+    FOREIGN KEY (id_ordem_trabalho) REFERENCES ordens_de_trabalho (id)
+);
+
+CREATE TABLE equipamentos
+(
+    id   VARCHAR(100),
+    nome VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE equipamento_ordemDeTrabalho
+(
+    id_equipamentos     VARCHAR(100),
+    id_ordem_trabalho   VARCHAR(100),
+    horas_de_utilizacao FLOAT,
+    data_de_aquisicao   DATETIME,
+    FOREIGN KEY (id_equipamentos) REFERENCES equipamentos (id),
+    FOREIGN KEY (id_ordem_trabalho) REFERENCES ordens_de_trabalho (id)
+);
+
+CREATE TABLE registos
+(
+    id           VARCHAR(100),
+    id_estado    VARCHAR(100),
+    id_proposta  VARCHAR(100),
+    data_inicial DATETIME,
+    data_final   DATETIME,
+    FOREIGN KEY (id_estado) REFERENCES estados (id),
+    FOREIGN KEY (id_proposta) REFERENCES propostas (id),
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE relatorios
+(
+    id                   VARCHAR(100),
+    id_proposta          VARCHAR(100),
+    data_inicio_proposta DATETIME,
+    data_fim_proposta    DATETIME,
+    relatorio            VARCHAR(255),
+    PRIMARY KEY (id),
+    FOREIGN KEY (id_proposta) REFERENCES propostas (id)
+);
+
+CREATE TABLE relatorio_registo
+(
+    id_relatorio VARCHAR(100),
+    id_registo   VARCHAR(100),
+    FOREIGN KEY (id_relatorio) REFERENCES relatorios (id),
+    FOREIGN KEY (id_registo) REFERENCES registos (id)
+);
