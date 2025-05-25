@@ -1,0 +1,273 @@
+CREATE TABLE Entidades
+(
+    id   INT,
+    nome VARCHAR(25) NOT NULL
+);
+
+ALTER TABLE Entidades
+    ADD CONSTRAINT PRIMARY KEY (id);
+
+CREATE TABLE Pareceres
+(
+    id                   INT,
+    titulo               VARCHAR(25) NOT NULL,
+    id_entidade          INT         NOT NULL,
+    id_parecer_reforcado INT
+);
+
+ALTER TABLE Pareceres
+    ADD CONSTRAINT PRIMARY KEY (id);
+
+ALTER TABLE Pareceres
+    ADD CONSTRAINT FOREIGN KEY (id_entidade) REFERENCES Entidades (id),
+    ADD CONSTRAINT FOREIGN KEY (id_parecer_reforcado) REFERENCES Pareceres (id);
+
+CREATE TABLE Municipes
+(
+    id   INT,
+    nome VARCHAR(25) NOT NULL
+);
+
+ALTER TABLE Municipes
+    ADD CONSTRAINT PRIMARY KEY (id);
+
+CREATE TABLE Pareceres_Municipes
+(
+    id          INT,
+    id_parecer  INT     NOT NULL,
+    id_municipe INT     NOT NULL,
+    a_favor     BOOLEAN NOT NULL,
+    motivo      VARCHAR(100)
+);
+
+ALTER TABLE Pareceres_Municipes
+    ADD CONSTRAINT PRIMARY KEY (id),
+    ADD CONSTRAINT FOREIGN KEY (id_parecer) REFERENCES Pareceres (id),
+    ADD CONSTRAINT FOREIGN KEY (id_municipe) REFERENCES Municipes (id);
+
+CREATE TABLE Proposta
+(
+    id            INT,
+    id_municipe   INT         NOT NULL,
+    id_estado     INT         NOT NULL,
+    titulo        VARCHAR(25) NOT NULL,
+    descricao     VARCHAR(100),
+    data_proposta DATE        NOT NULL
+);
+
+ALTER TABLE Proposta
+    ADD CONSTRAINT PRIMARY KEY (id),
+    ADD CONSTRAINT FOREIGN KEY (id_municipe) REFERENCES Municipes (id);
+
+CREATE TABLE Votos
+(
+    id            INT,
+    id_municipe   INT                                        NOT NULL,
+    id_proposta   INT                                        NOT NULL,
+    classificacao INT CHECK (classificacao BETWEEN 0 and 10) NOT NULL,
+    justificao    VARCHAR(100)
+);
+
+ALTER TABLE Votos
+    ADD CONSTRAINT PRIMARY KEY (id),
+    ADD CONSTRAINT FOREIGN KEY (id_municipe) REFERENCES Municipes (id),
+    ADD CONSTRAINT FOREIGN KEY (id_proposta) REFERENCES Proposta (id);
+
+CREATE TABLE Registos
+(
+    id           INT,
+    id_estado    INT  NOT NULL,
+    id_proposta  INT  NOT NULL,
+    data_inicial DATE NOT NULL,
+    data_final   DATE NOT NULL
+);
+
+CREATE TABLE Estados
+(
+    id   INT,
+    nome VARCHAR(25) NOT NULL
+);
+
+ALTER TABLE Estados
+    ADD CONSTRAINT PRIMARY KEY (id);
+
+ALTER TABLE Registos
+    ADD CONSTRAINT PRIMARY KEY (id),
+    ADD CONSTRAINT FOREIGN KEY (id_estado) REFERENCES Estados (id),
+    ADD CONSTRAINT FOREIGN KEY (id_proposta) REFERENCES Proposta (id);
+
+CREATE TABLE Relatorios
+(
+    id_proposta          INT,
+    data_inicio_proposta DATE,
+    data_fim_proposta    DATE,
+    relatorio            VARCHAR(225)
+);
+
+ALTER TABLE Relatorios
+    ADD CONSTRAINT PRIMARY KEY (id_proposta),
+    ADD CONSTRAINT FOREIGN KEY (id_proposta) REFERENCES Proposta (id);
+
+CREATE TABLE Responsaveis
+(
+    id   INT,
+    nome VARCHAR(25) NOT NULL
+);
+
+ALTER TABLE Responsaveis
+    ADD CONSTRAINT PRIMARY KEY (id);
+
+CREATE TABLE Propostas_exequiveis
+(
+    id_proposta    INT,
+    id_responsavel INT            NOT NULL,
+    data_inicio    DATE           NOT NULL,
+    data_fim       DATE,
+    montante       DECIMAL(15, 2) NOT NULL CHECK ( montante > 0 ),
+    financiamento  DECIMAL(15, 2)
+);
+
+ALTER TABLE Propostas_exequiveis
+    ADD CONSTRAINT PRIMARY KEY (id_proposta),
+    ADD CONSTRAINT FOREIGN KEY (id_proposta) REFERENCES Proposta (id),
+    ADD CONSTRAINT FOREIGN KEY (id_responsavel) REFERENCES Responsaveis (id);
+
+CREATE TABLE Execucoes
+(
+    id_proposta       INT,
+    data_inicio       DATE           NOT NULL,
+    data_fim          DATE,
+    montante          DECIMAL(15, 2) NOT NULL,
+    percentagem_coima DOUBLE         NOT NULL
+);
+
+ALTER TABLE Execucoes
+    ADD CONSTRAINT PRIMARY KEY (id_proposta);
+
+CREATE TABLE Auto_obra
+(
+    id_execucao          INT,
+    data_inicio_consulta DATE NOT NULL,
+    data_fim_consulta    DATE NOT NULL
+);
+
+ALTER TABLE Auto_obra
+    ADD CONSTRAINT PRIMARY KEY (id_execucao);
+
+-- -------------------------------------- REVER ESTA PARTE -----------------------------------------------------
+CREATE TABLE Fases
+(
+    id   INT,
+    nome VARCHAR(25) NOT NULL
+);
+
+ALTER TABLE Fases
+    ADD CONSTRAINT PRIMARY KEY (id);
+
+CREATE TABLE Construtoras
+(
+    id   INT,
+    nome VARCHAR(25) NOT NULL
+);
+
+ALTER TABLE Construtoras
+    ADD CONSTRAINT PRIMARY KEY (id);
+
+CREATE TABLE Consorcio
+(
+    id                INT,
+    nome              VARCHAR(25) NOT NULL,
+    data_constituicao DATE
+);
+
+ALTER TABLE Consorcio
+    ADD CONSTRAINT PRIMARY KEY (id);
+
+CREATE TABLE Consorcios_Construtoras
+(
+    id             INT,
+    id_construtora INT  NOT NULL,
+    id_consorcio   INT  NOT NULL,
+    data_entrada   DATE NOT NULL
+);
+
+ALTER TABLE Consorcios_Construtoras
+    ADD CONSTRAINT PRIMARY KEY (id),
+    ADD CONSTRAINT FOREIGN KEY (id_consorcio) REFERENCES Consorcio (id),
+    ADD CONSTRAINT FOREIGN KEY (id_construtora) REFERENCES Construtoras (id);
+
+CREATE TABLE Orcamentos
+(
+    id                   INT,
+    id_construtora       INT,
+    id_consorcio         INT,
+    data_inicio_execucao INT            NOT NULL,
+    data_fim_execucao    INT            NOT NULL,
+    montante             DECIMAL(15, 2) NOT NULL
+);
+
+ALTER TABLE Orcamentos
+    ADD CONSTRAINT PRIMARY KEY (id),
+    ADD CONSTRAINT FOREIGN KEY (id_construtora) REFERENCES Construtoras (id),
+    ADD CONSTRAINT FOREIGN KEY (id_consorcio) REFERENCES Consorcio (id);
+
+CREATE TABLE Fases_Execucao
+(
+    id_execucao  INT NOT NULL,
+    id_fase      INT NOT NULL,
+    id_orcamento INT
+);
+
+CREATE TABLE Ordens_trabalho
+(
+    id_orcamento INT,
+    nome         VARCHAR(25),
+    data_inicio  DATE,
+    data_fim     DATE
+);
+
+ALTER TABLE Ordens_trabalho
+    ADD CONSTRAINT PRIMARY KEY (id_orcamento),
+    ADD CONSTRAINT FOREIGN KEY (id_orcamento) REFERENCES Orcamentos (id);
+
+CREATE TABLE Equipamentos
+(
+    id   INT,
+    nome VARCHAR(25) NOT NULL
+);
+
+ALTER TABLE Equipamentos
+    ADD CONSTRAINT PRIMARY KEY (id);
+
+CREATE TABLE OrdensTrabalho_Equipamentos
+(
+    id                INT,
+    id_ordem_trabalho INT NOT NULL,
+    id_equipamento    INT NOT NULL
+);
+
+ALTER TABLE OrdensTrabalho_Equipamentos
+    ADD CONSTRAINT PRIMARY KEY (id),
+    ADD CONSTRAINT FOREIGN KEY (id_ordem_trabalho) REFERENCES Ordens_trabalho (id_orcamento),
+    ADD CONSTRAINT FOREIGN KEY (id_equipamento) REFERENCES Equipamentos (id);
+
+CREATE TABLE Materiais
+(
+    id   INT,
+    nome VARCHAR(25) NOT NULL
+);
+
+ALTER TABLE Materiais
+    ADD CONSTRAINT PRIMARY KEY (id);
+
+CREATE TABLE OrdensTrabalho_Materiais
+(
+    id                INT,
+    id_ordem_trabalho INT NOT NULL,
+    id_material       INT NOT NULL
+);
+
+ALTER TABLE OrdensTrabalho_Materiais
+    ADD CONSTRAINT PRIMARY KEY (id),
+    ADD CONSTRAINT FOREIGN KEY (id_ordem_trabalho) REFERENCES Ordens_trabalho (id_orcamento),
+    ADD CONSTRAINT FOREIGN KEY (id_material) REFERENCES Materiais (id);
