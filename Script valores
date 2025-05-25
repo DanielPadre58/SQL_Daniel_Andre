@@ -1,0 +1,66 @@
+-- Munícipes
+INSERT INTO Municipes (id, nome) VALUES
+                                     (1, 'Rita Silva'),
+                                     (2, 'Rita Costa'),
+                                     (3, 'João Sousa'),
+                                     (4, 'Ana Martins'),
+                                     (5, 'Pedro Alves');
+
+-- Estados
+INSERT INTO Estados (id, nome) VALUES
+                                   (1, 'Proposta'),
+                                   (2, 'Aprovada'),
+                                   (3, 'Executada');
+
+-- Propostas
+INSERT INTO Proposta (id, id_municipe, id_estado, titulo, descricao, data_proposta) VALUES
+                                                                                        (1, 1, 1, 'Melhoria do parque', 'Renovação do parque infantil', '2024-04-15'),
+                                                                                        (2, 2, 2, 'Requalificação da escola', 'Obras na escola primária', '2024-05-10'),
+                                                                                        (3, 1, 3, 'Nova ciclovia', 'Construção de ciclovia', '2024-01-20'),
+                                                                                        (4, 3, 2, 'Centro comunitário', 'Espaço para eventos', '2023-11-11'),
+                                                                                        (5, 3, 3, 'Espaço verde', 'Novo jardim público', '2024-06-05'),
+                                                                                        (6, 4, 1, 'Reparação da estrada', 'Obras na estrada municipal', '2024-03-22'),
+                                                                                        (7, 5, 1, 'Biblioteca moderna', 'Nova biblioteca central', '2024-04-18');
+
+-- Votos (11 avaliações para a proposta 1)
+INSERT INTO Votos (id, id_municipe, id_proposta, classificacao, justificao) VALUES
+                                                                                (1, 1, 1, 9, 'Muito necessário'),
+                                                                                (2, 2, 1, 8, 'Boa proposta'),
+                                                                                (3, 3, 1, 8, 'Apoio total'),
+                                                                                (4, 4, 1, 8, 'Concordo plenamente'),
+                                                                                (5, 5, 1, 9, 'Excelente'),
+                                                                                (6, 2, 1, 8, 'Bem estruturada'),
+                                                                                (7, 3, 1, 9, 'Fundamental'),
+                                                                                (8, 4, 1, 10, 'Imprescindível'),
+                                                                                (9, 5, 1, 8, 'Boa iniciativa'),
+                                                                                (10, 1, 1, 9, 'Muito bom'),
+                                                                                (11, 2, 1, 8, 'Concordo');
+-- Responsáveis
+INSERT INTO Responsaveis (id, nome) VALUES
+                                        (1, 'Carlos Silva'),
+                                        (2, 'Maria Oliveira');
+
+-- Propostas Exequíveis (com o mesmo montante para o mesmo munícipe - Rita)
+INSERT INTO Propostas_exequiveis (id_proposta, id_responsavel, data_inicio, data_fim, montante, financiamento) VALUES
+                                                                                                                   (1, 1, '2024-06-01', '2024-12-01', 50000.00, 10000.00),
+                                                                                                                   (3, 2, '2024-07-01', '2025-01-01', 50000.00, 12000.00),
+                                                                                                                   (2, 1, '2024-05-15', '2024-12-15', 40000.00, 8000.00);
+
+
+-- Insert Construtoras
+INSERT INTO Construtoras (id, nome) VALUES
+                                        (1, 'Construtora Alfa'),
+                                        (2, 'Construtora Beta'),
+                                        (3, 'Construtora Gama');
+
+-- Insert Consorcios
+INSERT INTO Consorcio (id, nome, data_constituicao) VALUES
+                                                        (1, 'Consórcio Litoral', '2021-05-10'),
+                                                        (2, 'Consórcio Norte', '2022-03-22');
+
+-- Insert Consorcios_Construtoras with data_entrada
+INSERT INTO Consorcios_Construtoras (id, id_construtora, id_consorcio, data_entrada) VALUES
+                                                                                         (1, 1, 1, '2021-06-01'),
+                                                                                         (2, 2, 1, '2021-07-15'),
+                                                                                         (3, 3, 2, '2022-04-01'),
+                                                                                         (4, 1, 2, '2022-05-10');
