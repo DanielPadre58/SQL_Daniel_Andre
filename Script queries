@@ -1,0 +1,135 @@
+-- a
+SELECT *
+FROM entidades;
+SELECT *
+FROM pareceres;
+SELECT *
+FROM municipes;
+SELECT *
+FROM pareceres_municipes;
+SELECT *
+FROM votos;
+SELECT *
+FROM registos;
+SELECT *
+FROM estados;
+SELECT *
+FROM relatorios;
+SELECT *
+FROM responsaveis;
+SELECT *
+FROM propostas_exequiveis;
+SELECT *
+FROM auto_obra;
+SELECT *
+FROM fases;
+SELECT *
+FROM construtoras;
+SELECT *
+FROM consorcio;
+SELECT *
+FROM consorcios_construtoras;
+SELECT *
+FROM orcamentos;
+SELECT *
+FROM fases_execucao;
+SELECT *
+FROM ordens_trabalho;
+SELECT *
+FROM equipamentos;
+SELECT *
+FROM ordenstrabalho_equipamentos;
+SELECT *
+FROM materiais;
+SELECT *
+FROM ordenstrabalho_materiais;
+SELECT *
+FROM proposta;
+SELECT *
+FROM execucoes;
+
+-- b
+
+SELECT m.*
+FROM municipes m
+         INNER JOIN proposta p
+                    ON p.id_municipe = m.id
+WHERE m.nome like '%Rita%'
+  AND MONTH(p.data_proposta) BETWEEN 4 and 6
+  AND YEAR(p.data_proposta) = 2024
+ORDER BY m.nome;
+
+-- c
+
+SELECT m.nome, COUNT(p.id) AS num_propostas
+FROM municipes m
+         LEFT OUTER JOIN proposta p ON p.id_municipe = m.id
+GROUP BY m.nome
+ORDER BY num_propostas DESC;
+
+-- d
+
+SELECT m.nome
+FROM municipes m
+         LEFT OUTER JOIN proposta p ON p.id_municipe = m.id
+GROUP BY m.nome
+HAVING COUNT(p.id) = 0
+ORDER BY m.nome;
+
+-- e
+
+SELECT p.titulo, AVG(v.classificacao) AS media_classificacao
+FROM proposta p
+         INNER JOIN votos v ON v.id_proposta = p.id
+WHERE MONTH(p.data_proposta) BETWEEN 1 AND 6
+  AND YEAR(p.data_proposta) = 2024
+GROUP BY p.titulo
+HAVING COUNT(v.id) >= 10
+   AND AVG(v.classificacao) >= 8
+ORDER BY media_classificacao DESC;
+
+-- f
+
+SELECT c.nome AS nome_construtora,
+       cs.nome AS nome_consorcio,
+       cc.data_entrada
+FROM construtoras c
+         INNER JOIN consorcios_construtoras cc ON cc.id_construtora = c.id
+         INNER JOIN consorcio cs ON cs.id = cc.id_consorcio
+WHERE cc.data_entrada = (
+    SELECT MIN(cc2.data_entrada)
+    FROM consorcios_construtoras cc2
+    WHERE cc2.id_construtora = cc.id_construtora
+);
+
+-- g
+
+SELECT m.nome
+FROM municipes m
+         INNER JOIN proposta p ON m.id = p.id_municipe
+         INNER JOIN propostas_exequiveis pe ON p.id = pe.id_proposta
+GROUP BY m.nome, pe.montante
+HAVING COUNT(*) >= 2
+ORDER BY m.nome;
+
+-- h
+
+CREATE VIEW TotalPropostasMunicipe_PorSemestre AS
+SELECT
+    m.id AS id_municipe,
+    m.nome AS nome_municipe,
+    COUNT(DISTINCT p1.id) AS propostas_1_semestre,
+    COUNT(DISTINCT p2.id) AS propostas_2_semestre
+FROM municipes m
+         LEFT JOIN proposta p1
+                   ON m.id = p1.id_municipe
+                       AND MONTH(p1.data_proposta) BETWEEN 1 AND 6
+         LEFT JOIN proposta p2
+                   ON m.id = p2.id_municipe
+                       AND MONTH(p2.data_proposta) BETWEEN 7 AND 12
+GROUP BY m.id, m.nome
+HAVING COUNT(DISTINCT p1.id) > 0 AND COUNT(DISTINCT p2.id) > 0;
+
+SELECT * FROM TotalPropostasMunicipe_PorSemestre;
+
+
